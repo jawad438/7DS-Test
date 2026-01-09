@@ -62,12 +62,12 @@ const App: React.FC = () => {
   const results = useMemo(() => {
     if (view !== 'results' && view !== 'calculating') return null;
 
-    // Weight Map to ensure base resonance
+    // Updated Weight Map as per user request
     const weights: Record<ResponseValue, number> = {
-      0: 1,  // Strongly Unrelatable
-      1: 3,  // Unrelatable
-      2: 7,  // Relatable
-      3: 12  // Strongly Relatable
+      0: 0,  // Strongly Unrelatable
+      1: 2,  // Unrelatable
+      2: 5,  // Relatable
+      3: 8   // Strongly Relatable
     };
 
     const rawScores: QuizResults = {
@@ -80,29 +80,38 @@ const App: React.FC = () => {
       [SinType.SLOTH]: 0,
     };
 
+    const counts: Record<SinType, number> = {
+      [SinType.PRIDE]: 0,
+      [SinType.GREED]: 0,
+      [SinType.LUST]: 0,
+      [SinType.ENVY]: 0,
+      [SinType.GLUTTONY]: 0,
+      [SinType.WRATH]: 0,
+      [SinType.SLOTH]: 0,
+    };
+
     QUESTIONS.forEach(q => {
       const val = answers[q.id] ?? 0;
       rawScores[q.sin] += weights[val];
+      counts[q.sin]++;
     });
 
-    const totalWeightedScore = Object.values(rawScores).reduce((acc, val) => acc + val, 0);
-    
     const normalized: QuizResults = { ...rawScores };
-    let currentSum = 0;
     const sinKeys = Object.keys(normalized) as SinType[];
 
     sinKeys.forEach((sin) => {
-      const share = Math.round((rawScores[sin] / totalWeightedScore) * 100);
-      normalized[sin] = share;
-      currentSum += share;
+      const minPossible = counts[sin] * weights[0];
+      const maxPossible = counts[sin] * weights[3];
+      const range = maxPossible - minPossible;
+      
+      // Calculate individual saturation from 0 to 100 based on the new weights
+      // With weights[0] being 0, minPossible is 0, so it's a direct percentage of the max potential.
+      const percentage = range > 0 
+        ? Math.round(((rawScores[sin] - minPossible) / range) * 100) 
+        : 0;
+      
+      normalized[sin] = Math.max(0, Math.min(100, percentage));
     });
-
-    // Adjust rounding to exactly 100
-    if (currentSum !== 100) {
-      const diff = 100 - currentSum;
-      const dominantSin = sinKeys.reduce((a, b) => rawScores[a] > rawScores[b] ? a : b);
-      normalized[dominantSin] += diff;
-    }
 
     return normalized;
   }, [answers, view]);

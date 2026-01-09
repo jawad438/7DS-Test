@@ -55,7 +55,7 @@ const Results: React.FC<ResultsProps> = ({ scores, onRestart }) => {
            <div className="absolute -inset-10 blur-[80px] rounded-full opacity-40" style={{ backgroundColor: `${getColorHex(dominantData.color)}22` }}></div>
            <div className="relative">
               <span className="block text-[10px] tracking-[1em] text-neutral-600 uppercase mb-4">{allEqual ? "The Absolute Singularity" : "Your Primary Affliction"}</span>
-              <h1 className="text-6xl md:text-9xl font-serif text-white tracking-[0.2em] uppercase">{displayTitle}</h1>
+              <h1 className="text-6xl md:text-9xl font-serif text-white tracking-[0.2em] uppercase transition-all duration-700">{displayTitle}</h1>
               <div className="mt-4 h-1.5 w-32 mx-auto" style={{ backgroundColor: getColorHex(dominantData.color) }}></div>
            </div>
         </div>
@@ -65,28 +65,29 @@ const Results: React.FC<ResultsProps> = ({ scores, onRestart }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24">
         <div className="space-y-8">
            <div className="flex justify-between items-end border-b border-neutral-900 pb-4 mb-8">
-              <h3 className="text-xs tracking-[0.4em] text-neutral-500 uppercase font-mono">Distribution of Vices</h3>
-              <span className="text-[10px] text-neutral-700 font-mono uppercase tracking-widest">Total Saturation: 100%</span>
+              <h3 className="text-xs tracking-[0.4em] text-neutral-500 uppercase font-mono">Soul Saturation</h3>
+              <span className="text-[10px] text-neutral-700 font-mono uppercase tracking-widest">Individual Intensity Profile</span>
            </div>
            {Object.values(SINS).map((sin) => {
              const score = scores[sin.type];
              const hexColor = getColorHex(sin.color);
-             const isActive = score > 15 || allEqual;
+             const isActive = score > 0;
              return (
                <div key={sin.type} className="group relative">
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full border border-neutral-800 overflow-hidden bg-black shadow-lg p-0.5" style={{ boxShadow: isActive ? `0 0 15px ${hexColor}44` : 'none' }}>
-                        <img src={sin.imageUrl} alt={sin.type} className={`w-full h-full object-cover rounded-full transition-all duration-700 ${isActive ? 'grayscale-0' : 'grayscale opacity-40'}`} />
+                      <div className="w-12 h-12 rounded-full border border-neutral-800 overflow-hidden bg-black shadow-lg p-0.5 transition-all duration-500 group-hover:border-neutral-600" style={{ boxShadow: score > 30 ? `0 0 15px ${hexColor}44` : 'none' }}>
+                        <img src={sin.imageUrl} alt={sin.type} className={`w-full h-full object-cover rounded-full transition-all duration-700 ${score > 10 ? 'grayscale-0' : 'grayscale opacity-40'}`} />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-bold tracking-[0.3em] uppercase transition-colors duration-500" style={{ color: isActive ? hexColor : '#525252' }}>{sin.type}</span>
-                        <span className="text-[9px] text-neutral-700 uppercase tracking-widest">Affinity {score}%</span>
+                        <span className="text-[10px] font-bold tracking-[0.3em] uppercase transition-colors duration-500" style={{ color: score > 20 ? hexColor : '#525252' }}>{sin.type}</span>
+                        <span className="text-[9px] text-neutral-700 uppercase tracking-widest">Affinities Detected</span>
                       </div>
                     </div>
+                    <span className="text-[10px] font-mono text-neutral-400">{score}/100</span>
                   </div>
                   <div className="h-2 w-full bg-neutral-900/50 rounded-full overflow-hidden border border-white/5 p-[1px]">
-                    <div className="h-full transition-all duration-[2000ms] ease-out rounded-full" style={{ width: `${score}%`, backgroundColor: hexColor, boxShadow: isActive ? `0 0 10px ${hexColor}88` : 'none' }}></div>
+                    <div className="h-full transition-all duration-[2000ms] ease-out rounded-full" style={{ width: `${score}%`, backgroundColor: hexColor, boxShadow: score > 50 ? `0 0 10px ${hexColor}88` : 'none' }}></div>
                   </div>
                </div>
              );
@@ -97,13 +98,13 @@ const Results: React.FC<ResultsProps> = ({ scores, onRestart }) => {
           <div className="absolute top-0 left-0 w-full h-1 opacity-60" style={{ backgroundColor: getColorHex(dominantData.color) }}></div>
           <div className="relative mb-12 flex items-center justify-center">
             <div className="absolute -inset-10 border rounded-full animate-spin-slow" style={{ borderColor: `${getColorHex(dominantData.color)}22` }}></div>
-            <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border border-white/10 shadow-2xl relative z-10 flex items-center justify-center bg-neutral-950" style={{ boxShadow: `0 0 40px ${getColorHex(dominantData.color)}33` }}>
-               {allEqual ? <BalanceIcon /> : <img src={dominantData.imageUrl} alt={displayTitle} className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 transition-all duration-1000" />}
+            <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border border-white/10 shadow-2xl relative z-10 flex items-center justify-center bg-neutral-950 transition-all duration-700" style={{ boxShadow: `0 0 40px ${getColorHex(dominantData.color)}33` }}>
+               {allEqual ? <BalanceIcon /> : <img src={dominantData.imageUrl} alt={displayTitle} className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110" />}
             </div>
           </div>
           <h3 className="text-3xl font-serif text-white mb-6 tracking-[0.3em] uppercase">Core Frequency: {displayTitle}</h3>
           <p className="text-neutral-400 leading-relaxed italic mb-10 text-sm md:text-lg font-light">
-            {allEqual ? "The weights are identical. Your heart balances perfectly between every path of descent." : `Your soul colors its decisions through the lens of ${dominantSin.toLowerCase()}.`}
+            {allEqual ? "The weights are identical. Your heart balances perfectly between every path of descent." : `Your soul colors its decisions through the lens of ${dominantSin.toLowerCase()}. It resonates with an intensity of ${scores[dominantSin]}%.`}
           </p>
           <div className="w-full p-8 bg-black/40 border border-white/5 text-[10px] text-neutral-500 tracking-[0.3em] leading-loose italic uppercase">"To know oneself is to know the universe and its shadows."</div>
         </div>
